@@ -7,7 +7,7 @@ This repository is a pretty small [Ansible playbook](https://www.redhat.com/en/a
 
 ## Deploying Genesis
 
-Deployment is quite simple: clone the repository, clone Ansible, configure the inventory, then run the playbook:
+Deployment is quite simple: clone the repository, install Ansible, configure the inventory, then run the playbook:
 
 ```bash
 git clone https://github.com/Jack-Gledhill/genesis
