@@ -1,0 +1,7 @@
+inventory.yml
+
+.idea/
+.vscode/
+.venv/
+files/cert.pem
+files/key.pem
