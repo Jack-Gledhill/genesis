@@ -1,0 +1,30 @@
+# See here: https://wgportal.org/latest/documentation/getting-started/docker/
+services:
+  wg-portal:
+    container_name: wg-portal
+    image: wgportal/wg-portal:v2
+    ports:
+      - "443:443/tcp"
+      - "51820:51820/udp"
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+    environment:
+      - WG_PORTAL_CONFIG=/etc/wg-portal/config.yml
+    cap_add:
+      - NET_ADMIN
+    sysctls:
+      - net.ipv4.conf.all.src_valid_mark=1
+      - net.ipv4.ip_forward=1
+    volumes:
+      - data:/app/data
+      - config:/app/config
+      - {{ config_dir }}/config.yml:/etc/wg-portal/config.yml
+      - {{ config_dir }}/cert.pem:/etc/wg-portal/cert.pem
+      - {{ config_dir }}/key.pem:/etc/wg-portal/key.pem
+    restart: always
+
+volumes:
+  data:
+  config:

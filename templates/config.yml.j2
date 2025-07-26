@@ -1,0 +1,79 @@
+# See here: https://wgportal.org/latest/documentation/configuration/overview/
+core:
+  admin_user: {{ config.admin.user }}
+  admin_password: {{ config.admin.password }}
+  admin_api_token: {{ config.admin.api_token }}
+  editable_keys: true
+  create_default_peer: false
+  create_default_peer_on_creation: false
+  re_enable_peer_after_user_enable: true
+  delete_peer_after_user_deleted: false
+  self_provisioning_allowed: true
+  import_existing: true
+  restore_state: true
+
+advanced:
+  log_level: info
+  log_pretty: false
+  log_json: false
+  start_listen_port: 51820
+  start_cidr_v4: {{ config.ipv4_cidr }}
+  start_cidr_v6: {{ config.ipv6_cidr }}
+  use_ip_v6: false
+  config_storage_path: ""
+  expiry_check_interval: 15m
+  rule_prio_offset: 20000
+  route_table_offset: 20000
+  api_admin_only: true
+
+database:
+  debug: false
+  slow_query_threshold: "0"
+  type: {{ config.database.type }}
+  dsn: {{ config.database.dsn }}
+  encryption_passphrase: {{ config.database.encryption_passphrase }}
+
+statistics:
+  use_ping_checks: true
+  ping_check_workers: 10
+  ping_unprivileged: false
+  ping_check_interval: 1m
+  data_collection_interval: 1m
+  collect_interface_data: true
+  collect_peer_data: true
+  collect_audit_data: true
+  listening_address: :8787
+
+mail:
+  host: {{ config.mail.host }}
+  port: {{ config.mail.port }}
+  encryption: {{ config.mail.encryption }}
+  cert_validation: true
+  username: {{ config.mail.username }}
+  password: {{ config.mail.password }}
+  auth_type: {{ config.mail.auth_type }}
+  from: {{ config.mail.from }}
+  link_only: true # Emails will include links to Wg Portal instead of attachments
+
+auth:
+  oidc: {{ config.auth.oidc }}
+  oauth: {{ config.auth.oauth }}
+  ldap: {{ config.auth.ldap }}
+
+web:
+  listening_address: {{ config.web.listening_address }}
+  external_url: {{ config.web.external_url }}
+  site_company_name: {{ config.web.site_company_name }}
+  site_title: {{ config.web.site_title }}
+  session_identifier: wgPortalSession
+  session_secret: {{ config.web.session_secret }}
+  csrf_secret: {{ config.web.csrf_secret }}
+  request_logging: false
+  expose_host_info: false
+  cert_file: /etc/wg-portal/cert.pem
+  key_file: /etc/wg-portal/key.pem
+
+webhook:
+  url: {{ config.webhook.url }}
+  authentication: {{ config.webhook.auth }}
+  timeout: 10s

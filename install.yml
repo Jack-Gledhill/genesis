@@ -1,0 +1,94 @@
+# See here: https://docs.docker.com/engine/install/ubuntu/#install-using-the-convenience-script
+- name: Install Docker
+  hosts: all
+
+  tasks:
+    - name: Check if docker is installed
+      ansible.builtin.command: which docker
+      changed_when: false
+      failed_when: false
+      register: installed
+
+    - name: Download convenience script
+      ansible.builtin.get_url:
+        url: https://get.docker.com
+        dest: /tmp/docker.sh
+        mode: "0700" # U:RWX, G:N, O:N
+      when: installed.rc != 0
+
+    - name: Run the Docker installation script
+      ansible.builtin.command:
+        cmd: sh /tmp/docker.sh
+      when: installed.rc != 0
+
+    - name: Ensure Docker is running
+      ansible.builtin.systemd:
+        name: docker
+        state: started
+        enabled: true
+
+    - name: Add user to docker group
+      ansible.builtin.user:
+        name: "{{ ansible_user }}"
+        groups:
+          - docker
+        append: true
+
+- name: Upload config files
+  hosts: all
+
+  tasks:
+    - name: Create WG Portal config directories
+      ansible.builtin.file:
+        path: "{{ config_dir }}"
+        state: directory
+        mode: "0700" # U:RWX, G:N, O:N
+
+    - name: Generate WG portal config file
+      ansible.builtin.template:
+        src: templates/config.yml.j2
+        dest: "{{ config_dir }}/config.yml"
+        owner: root
+        group: root
+        mode: "0600" # U:RW, G:N, O:N
+
+    - name: Upload certificate public key
+      ansible.builtin.copy:
+        src: files/cert.pem
+        dest: "{{ config_dir }}/cert.pem"
+        owner: root
+        group: root
+        mode: "0600" # U:RW, G:N, O:N
+
+    - name: Upload certificate private key
+      ansible.builtin.copy:
+        src: files/key.pem
+        dest: "{{ config_dir }}/key.pem"
+        owner: root
+        group: root
+        mode: "0600" # U:RW, G:N, O:N
+
+- name: Deploy WG Portal with Docker Compose
+  hosts: all
+
+  tasks:
+    - name: Generate Docker Compose stack
+      ansible.builtin.template:
+        src: templates/compose.yml.j2
+        dest: "{{ config_dir }}/compose.yml"
+        owner: root
+        group: root
+        mode: "0600" # U:RW, G:N, O:N
+
+    - name: Deploy Compose stack
+      community.docker.docker_compose_v2:
+        assume_yes: true
+        project_name: genesis
+        project_src: "{{ config_dir }}"
+        wait: true
+        recreate: always
+        state: present
+      register: output
+
+    - ansible.builtin.debug:
+        var: output

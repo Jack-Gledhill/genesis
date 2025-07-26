@@ -1,0 +1,45 @@
+all:
+  vars:
+    ansible_user: root
+    ansible_port: 22
+    ansible_ssh_private_key_file: ~/.ssh/id_ed25519
+    ansible_become: true
+
+    config_dir: /etc/genesis
+    config:
+      ipv4_cidr: 10.0.0.0/8
+      ipv6_cidr: fc00::/7
+      admin:
+        user: admin
+        password: password
+        api_token: ""
+      database:
+        type: sqlite
+        dsn: data/sqlite.db
+        encryption_passphrase: something_secure_here
+      web:
+        listening_address: :443
+        external_url: https://genesis.com
+        site_company_name: Genesis VPN
+        site_title: Genesis Portal
+        session_secret: something_secure_here
+        csrf_secret: something_secure_here
+      mail:
+        host: mail.server.com
+        port: 25
+        encryption: starttls
+        username: noreply@genesis.com
+        password: secure_password_here
+        auth_type: login
+        from: Genesis VPN <noreply@genesis.com>
+      webhook:
+        url: ""
+        auth: ""
+      auth:
+        oidc: []
+        oauth: []
+        ldap: []
+
+  hosts:
+    host1:
+      ansible_host: 192.168.0.1
