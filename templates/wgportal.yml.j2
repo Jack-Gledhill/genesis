@@ -53,7 +53,7 @@ mail:
   password: {{ config.mail.password }}
   auth_type: {{ config.mail.auth_type }}
   from: {{ config.mail.from }}
-  link_only: true # Emails will include links to Wg Portal instead of attachments
+  link_only: false
 
 auth:
   oidc: {{ config.auth.oidc }}
