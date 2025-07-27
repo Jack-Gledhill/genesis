@@ -81,6 +81,9 @@ services:
       timeout: 30s
       retries: 3
       start_period: 10s
+    networks:
+      default:
+        ipv4_address: 172.18.0.4
     restart: always
 
 networks:
@@ -89,7 +92,6 @@ networks:
     ipam:
       config:
         - subnet: 172.18.0.0/24
-          gateway: 172.18.0.1
 
 volumes:
   adguard:
