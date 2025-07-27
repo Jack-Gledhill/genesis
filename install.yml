@@ -38,16 +38,36 @@
   hosts: all
 
   tasks:
-    - name: Create WG Portal config directories
+    - name: Create Genesis directory
       ansible.builtin.file:
         path: "{{ config_dir }}"
         state: directory
         mode: "0700" # U:RWX, G:N, O:N
 
+    - name: Create Traefik config directory
+      ansible.builtin.file:
+        path: "{{ config_dir }}/traefik"
+        state: directory
+        mode: "0700" # U:RWX, G:N, O:N
+
+    - name: Create Wg Portal config directory
+      ansible.builtin.file:
+        path: "{{ config_dir }}/wgportal"
+        state: directory
+        mode: "0700" # U:RWX, G:N, O:N
+
     - name: Generate WG portal config file
       ansible.builtin.template:
-        src: templates/config.yml.j2
-        dest: "{{ config_dir }}/config.yml"
+        src: templates/wgportal.yml.j2
+        dest: "{{ config_dir }}/wgportal/config.yml"
+        owner: root
+        group: root
+        mode: "0600" # U:RW, G:N, O:N
+
+    - name: Upload traefik config file
+      ansible.builtin.copy:
+        src: files/traefik.yml
+        dest: "{{ config_dir }}/traefik/config.yml"
         owner: root
         group: root
         mode: "0600" # U:RW, G:N, O:N
@@ -55,7 +75,7 @@
     - name: Upload certificate public key
       ansible.builtin.copy:
         src: files/cert.pem
-        dest: "{{ config_dir }}/cert.pem"
+        dest: "{{ config_dir }}/traefik/cert.pem"
         owner: root
         group: root
         mode: "0600" # U:RW, G:N, O:N
@@ -63,7 +83,7 @@
     - name: Upload certificate private key
       ansible.builtin.copy:
         src: files/key.pem
-        dest: "{{ config_dir }}/key.pem"
+        dest: "{{ config_dir }}/traefik/key.pem"
         owner: root
         group: root
         mode: "0600" # U:RW, G:N, O:N

@@ -4,7 +4,6 @@ services:
     container_name: wg-portal
     image: wgportal/wg-portal:v2
     ports:
-      - "443:443/tcp"
       - "51820:51820/udp"
     logging:
       options:
@@ -20,11 +19,79 @@ services:
     volumes:
       - data:/app/data
       - config:/app/config
-      - {{ config_dir }}/config.yml:/etc/wg-portal/config.yml
-      - {{ config_dir }}/cert.pem:/etc/wg-portal/cert.pem
-      - {{ config_dir }}/key.pem:/etc/wg-portal/key.pem
+      - {{ config_dir }}/wgportal/config.yml:/etc/wg-portal/config.yml
+    labels:
+      traefik.enable: true
+      traefik.http.routers.wgportal.rule: Host(`vpn.jackgledhill.com`)
+      traefik.http.routers.wgportal.entrypoints: websecure
+      traefik.http.services.wgportal.loadbalancer.server.port: 80
+    networks:
+      default:
+        ipv4_address: 172.18.0.2
     restart: always
 
+  adguard:
+    container_name: adguard
+    image: adguard/adguardhome:latest
+    volumes:
+      - adguard:/opt/adguardhome/conf
+    labels:
+      traefik.enable: true
+      traefik.http.routers.adguard.rule: Host(`dns.jackgledhill.com`)
+      traefik.http.routers.adguard.entrypoints: websecure
+      traefik.http.services.adguard.loadbalancer.server.port: 3000
+    networks:
+      default:
+        ipv4_address: 172.18.0.3
+    restart: always
+
+  traefik:
+    container_name: traefik
+    image: traefik:v3.4
+    ports:
+      - "80:80/tcp"
+      - "443:443/tcp"
+    command:
+      - --api.insecure
+      - --api.dashboard
+      - --ping
+      - --log.level=DEBUG
+      - --global.sendanonymoususage=false
+      - --providers.docker
+      - --providers.file.filename=/etc/traefik/config.yml
+      - --entrypoints.web.address=:80
+      - --entrypoints.web.forwardedheaders.insecure=false
+      - --entrypoints.web.forwardedheaders.trustedips=10.0.0.0/8,172.16.0.0/12,192.168.0.0/16,fc00::/7
+      - --entrypoints.web.proxyprotocol.insecure=false
+      - --entrypoints.web.proxyprotocol.trustedips=10.0.0.0/8,172.16.0.0/12,192.168.0.0/16,fc00::/7
+      - --entrypoints.websecure.address=:443
+      - --entrypoints.websecure.http.tls=true
+      - --entrypoints.websecure.forwardedheaders.insecure=false
+      - --entrypoints.websecure.forwardedheaders.trustedips=10.0.0.0/8,172.16.0.0/12,192.168.0.0/16,fc00::/7
+      - --entrypoints.websecure.proxyprotocol.insecure=false
+      - --entrypoints.websecure.proxyprotocol.trustedips=10.0.0.0/8,172.16.0.0/12,192.168.0.0/16,fc00::/7
+      - --entrypoints.web.http.redirections.entrypoint.to=websecure
+      - --entrypoints.web.http.redirections.entrypoint.scheme=https
+    volumes:
+      - {{ config_dir }}/traefik:/etc/traefik
+      - /var/run/docker.sock:/var/run/docker.sock
+    healthcheck:
+      test: traefik healthcheck --ping
+      interval: 60s
+      timeout: 30s
+      retries: 3
+      start_period: 10s
+    restart: always
+
+networks:
+  default:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.18.0.0/24
+          gateway: 172.18.0.1
+
 volumes:
-  data:
+  adguard:
   config:
+  data:

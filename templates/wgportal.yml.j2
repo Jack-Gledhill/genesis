@@ -61,7 +61,7 @@ auth:
   ldap: {{ config.auth.ldap }}
 
 web:
-  listening_address: {{ config.web.listening_address }}
+  listening_address: :80
   external_url: {{ config.web.external_url }}
   site_company_name: {{ config.web.site_company_name }}
   site_title: {{ config.web.site_title }}
@@ -70,8 +70,8 @@ web:
   csrf_secret: {{ config.web.csrf_secret }}
   request_logging: false
   expose_host_info: false
-  cert_file: /etc/wg-portal/cert.pem
-  key_file: /etc/wg-portal/key.pem
+  cert_file: ""
+  key_file: ""
 
 webhook:
   url: {{ config.webhook.url }}

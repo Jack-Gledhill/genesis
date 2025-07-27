@@ -16,16 +16,6 @@ pip install -r requirements.txt
 ansible-playbook install.yml
 ```
 
-## Connecting to Genesis
-
-Genesis has two access points: a web interface, and the Wireguard server. 
-The web interface is available at [`https://genesis.jackgledhill.com`](https://genesis.jackgledhill.com). 
-It's proxied and secured by [Cloudflare](https://cloudflare.com), which is why the Wireguard server has to be accessed through a different subdomain: `connect.genesis.jackgledhill.com:51820`. 
-
-## Can I get an account?
-
-Probably not. 
-
 ## Mailing
 
 Genesis has been configured to send emails through [smtp2go](https://smtp2go.com). 

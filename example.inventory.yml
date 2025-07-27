@@ -18,7 +18,6 @@ all:
         dsn: data/sqlite.db
         encryption_passphrase: something_secure_here
       web:
-        listening_address: :443
         external_url: https://genesis.com
         site_company_name: Genesis VPN
         site_title: Genesis Portal
